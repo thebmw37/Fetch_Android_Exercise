@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
             for (i in 0 until fetchData.length()) {
                 val rowData = fetchData.getJSONObject(i)
 
-                if(!rowData["name"].equals(null)) {
+                if(!rowData["name"].equals(null) && !rowData["name"].equals("")) {
 
                     val newItem = ListItem(rowData["id"].toString(), rowData["listId"].toString(), rowData["name"] as String)
 
@@ -47,7 +47,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            val sortedData = listData.sortedBy { it.listIdText }
+            // Sorting simply by name gives out of order numeric results in the list
+
+            val sortedData = listOf(ListItem("id", "listId", "name")) + listData.sortedWith(compareBy({ it.listIdText }, { it.nameText.toInt() }))
+
+            // it.nameText.slice(4 until it.nameText.length - 1).toInt()
 
             findViewById<RecyclerView>(R.id.recycler_view).adapter = RecyclerAdapter(sortedData)
             findViewById<RecyclerView>(R.id.recycler_view).layoutManager = LinearLayoutManager(this)
