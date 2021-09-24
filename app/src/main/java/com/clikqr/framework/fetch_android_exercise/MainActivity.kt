@@ -5,6 +5,11 @@ import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import org.json.JSONArray
+import org.json.JSONObject
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,12 +22,35 @@ class MainActivity : AppCompatActivity() {
         // Create an instance of the View Model
         viewModel = ViewModelProvider(this).get(MainViewModel()::class.java)
 
-        val mutableData = MutableLiveData<Unit>()
+        val mutableData = MutableLiveData<String>()
 
-        val observer = Observer<Unit> { webData ->
+        var fetchData: JSONArray
+
+        var listData: List<ListItem> = listOf()
+
+        val observer = Observer<String> { webData ->
             mutableData.value = webData
 
             println(mutableData.value)
+
+            fetchData = JSONArray(webData)
+
+            for (i in 0 until fetchData.length()) {
+                val rowData = fetchData.getJSONObject(i)
+
+                if(!rowData["name"].equals(null)) {
+
+                    val newItem = ListItem(rowData["id"].toString(), rowData["listId"].toString(), rowData["name"] as String)
+
+                    listData += newItem
+
+                }
+            }
+
+            findViewById<RecyclerView>(R.id.recycler_view).adapter = RecyclerAdapter(listData)
+            findViewById<RecyclerView>(R.id.recycler_view).layoutManager = LinearLayoutManager(this)
+            findViewById<RecyclerView>(R.id.recycler_view).setHasFixedSize(true)
+
         }
 
         viewModel.liveData.observeForever(observer)

@@ -2,15 +2,24 @@ package com.clikqr.framework.fetch_android_exercise
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 
 class MainRepository {
 
     val fetchWebservice = FetchWebservice()
 
-    private val mutableData = MutableLiveData<Unit>()
-    val liveData: LiveData<Unit> = mutableData
+    private val mutableData = MutableLiveData<String>()
+    val liveData: LiveData<String> = mutableData
 
-    fun requestData(): Unit {
-        return fetchWebservice.requestData()
+    val observer = Observer<String> { webData ->
+        mutableData.value = webData
+    }
+
+    init {
+        fetchWebservice.liveData.observeForever(observer)
+    }
+
+    fun requestData() {
+        fetchWebservice.requestData()
     }
 }

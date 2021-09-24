@@ -9,10 +9,10 @@ class MainViewModel : ViewModel()  {
 
     val mainRepository = MainRepository()
 
-    private val mutableData = MutableLiveData<Unit>()
-    val liveData: LiveData<Unit> = mutableData
+    private val mutableData = MutableLiveData<String>()
+    val liveData: LiveData<String> = mutableData
 
-    val observer = Observer<Unit> { webData ->
+    val observer = Observer<String> { webData ->
         mutableData.value = webData
     }
 
