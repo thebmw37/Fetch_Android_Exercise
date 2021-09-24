@@ -47,7 +47,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            findViewById<RecyclerView>(R.id.recycler_view).adapter = RecyclerAdapter(listData)
+            val sortedData = listData.sortedBy { it.listIdText }
+
+            findViewById<RecyclerView>(R.id.recycler_view).adapter = RecyclerAdapter(sortedData)
             findViewById<RecyclerView>(R.id.recycler_view).layoutManager = LinearLayoutManager(this)
             findViewById<RecyclerView>(R.id.recycler_view).setHasFixedSize(true)
 
