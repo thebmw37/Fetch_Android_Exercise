@@ -8,8 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
-import org.json.JSONObject
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,21 +20,29 @@ class MainActivity : AppCompatActivity() {
         // Create an instance of the View Model
         viewModel = ViewModelProvider(this).get(MainViewModel()::class.java)
 
+        // Create mutable data object for request data
         val mutableData = MutableLiveData<String>()
 
-        var fetchData: JSONArray
+        // Variable for formatting data in JSON
+        var jsonData: JSONArray
 
+        // Final List for sorted data
         var listData: List<ListItem> = listOf()
 
+        // Observer for obtaining live data from View Model
         val observer = Observer<String> { webData ->
+
             mutableData.value = webData
 
             println(mutableData.value)
 
-            fetchData = JSONArray(webData)
+            jsonData = JSONArray(webData)
 
-            for (i in 0 until fetchData.length()) {
-                val rowData = fetchData.getJSONObject(i)
+            // Iterate through the data and create ListItems and append them to listData
+            for (i in 0 until jsonData.length()) {
+
+                // Convert data into JSON Object
+                val rowData = jsonData.getJSONObject(i)
 
                 if(!rowData["name"].equals(null) && !rowData["name"].equals("")) {
 
@@ -47,20 +53,22 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            // Sorting simply by name gives out of order numeric results in the list
+            // Sorting list data
+            // Sorting by name gives out of order numeric results, so we convert nameText to int to sort properly
+            val sortedData = listOf(ListItem("id", "listId", "name")) +
+                    listData.sortedWith(compareBy({ it.listIdText }, { it.nameText.toInt() }))
 
-            val sortedData = listOf(ListItem("id", "listId", "name")) + listData.sortedWith(compareBy({ it.listIdText }, { it.nameText.toInt() }))
-
-            // it.nameText.slice(4 until it.nameText.length - 1).toInt()
-
+            // Setting up Recycler View
             findViewById<RecyclerView>(R.id.recycler_view).adapter = RecyclerAdapter(sortedData)
             findViewById<RecyclerView>(R.id.recycler_view).layoutManager = LinearLayoutManager(this)
             findViewById<RecyclerView>(R.id.recycler_view).setHasFixedSize(true)
 
         }
 
+        // Set observer for View Model
         viewModel.liveData.observeForever(observer)
 
+        // Request data through View Model
         viewModel.requestData()
 
     }
