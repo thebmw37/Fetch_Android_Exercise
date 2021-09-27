@@ -10,12 +10,12 @@ class MainViewModel : ViewModel()  {
     val mainRepository = MainRepository()
 
     // Live data variables
-    private val mutableData = MutableLiveData<String>()
-    val liveData: LiveData<String> = mutableData
+    private val mutableData = MutableLiveData<List<ListItem>>()
+    val liveData: LiveData<List<ListItem>> = mutableData
 
     // Setting observer to update mutableData
-    val observer = Observer<String> { webData ->
-        mutableData.value = webData
+    val observer = Observer<List<ListItem>> { sortedWebData ->
+        mutableData.value = sortedWebData
     }
 
     // Initialize observer
